@@ -1,13 +1,13 @@
 from node import INode
 
 
-class ChaosTestingEngine:
+class SPOFProofEngine:
     nodes = dict()
     dependency_found = []
 
-    def add_node(self, inode: INode):
-        self.nodes[inode.get_name()] = inode
-        return self
+    def set_nodes(self, inodes: [INode]):
+        for inode in inodes:
+            self.nodes[inode.get_name()] = inode
 
     def run_test(self):
         # TODO: implementation of chaotic testing

@@ -8,12 +8,6 @@ class ResponseLevel(Enum):
     TERMINATED = 2 # node cannot respond
 
 
-class IStartable(ABC):
-    @abstractmethod
-    def start(self):
-        pass
-
-
 class INode(ABC):
     # Representation of microservices
     # Should use interface so that our project can be "extensible" for non-localhost
@@ -34,11 +28,10 @@ class INode(ABC):
         pass
 
 
-class SimpleNode(INode, IStartable):
+class SimpleNode(INode):
     name = ''
     ip_address = ''
     port = 0
-    dependencies = []
 
     def __init__(self, name='', ip_address='', port=0):
         self.name = name
@@ -50,13 +43,6 @@ class SimpleNode(INode, IStartable):
 
     def get_name(self):
         return self.name
-
-    def set_dependencies(self, node):
-        self.dependencies = ['{}:{}'.format(x.ip_address, x.port) for x in node]
-
-    def start(self):
-        # TODO: when called, this method will start the webserver on specified ip_address & port
-        pass
 
     def ping(self):
         # TODO: when called, it will hit the ping API in the node
