@@ -9,7 +9,6 @@ class ResponseLevel(Enum):
 
 
 class IStartable(ABC):
-    # Interface will be used to bootstrap the network
     @abstractmethod
     def start(self):
         pass
@@ -52,9 +51,8 @@ class SimpleNode(INode, IStartable):
     def get_name(self):
         return self.name
 
-    def add_dependency(self, node):
-        self.dependencies.append('{}:{}'.format(node.ip_address, node.port))
-        return self
+    def set_dependencies(self, node):
+        self.dependencies = ['{}:{}'.format(x.ip_address, x.port) for x in node]
 
     def start(self):
         # TODO: when called, this method will start the webserver on specified ip_address & port

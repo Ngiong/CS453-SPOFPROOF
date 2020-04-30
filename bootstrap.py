@@ -12,9 +12,7 @@ def bootstrap():
     parent2.start()
 
     dependant = SimpleNode(name='dependant', ip_address='localhost', port=3889)
-    dependant\
-        .add_dependency(parent1)\
-        .add_dependency(parent2)
+    dependant.set_dependencies([parent1, parent2])
 
     dependant.start()
 
