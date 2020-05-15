@@ -30,7 +30,7 @@ class INode(ABC):
         pass
 
     @abstractmethod
-    def set_response_level(self: ResponseLevel):
+    def set_response_level(self, response_level: ResponseLevel):
         pass
 
     @abstractmethod

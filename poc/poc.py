@@ -22,12 +22,12 @@ class POCNode(INode):
     def get_name(self):
         return self.name
 
-    def ping(self):
+    def ping(self) -> bool:
         # TODO: when called, it will hit the ping API in the node
         # TODO: (cont.d) then node will ping all of its dependencies
         pass
 
-    def set_response_level(self: ResponseLevel):
+    def set_response_level(self, response_level: ResponseLevel) -> bool:
         # TODO: when called, it will hit the set response level API in the node
         pass
 

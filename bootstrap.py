@@ -11,7 +11,7 @@ class IStartable(ABC):
     def start(self):
         pass
 
-
+# TODO: IMPORTANT! THIS CODE DESIGN IS TERRIBLY WRONG. Please refer to the PoC in poc directory.
 class SimpleNodeStartable(INode, IStartable):
     dependencies = []
 
@@ -21,7 +21,7 @@ class SimpleNodeStartable(INode, IStartable):
     def ping(self):
         pass
 
-    def set_response_level(self: ResponseLevel):
+    def set_response_level(self, response_level: ResponseLevel):
         pass
 
     def get_name(self):
