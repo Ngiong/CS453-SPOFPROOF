@@ -4,7 +4,7 @@ from threading import Thread
 from time import sleep
 from typing import Iterable
 
-from flask import Flask, Response, current_app
+from flask import Flask, Response, current_app, request
 from requests import get as http_get
 
 from node import ResponseLevel, inverse_response_level
@@ -22,10 +22,11 @@ def create_application(app_name, dependencies=None):
     def check_dependencies(dependencies: Iterable[str], executor: _base.Executor) -> bool:
         futures = []
         for target in dependencies:
-            future = executor.submit(lambda: http_get(f'http://{target}/'))
-            futures.append(future)
+            get_url = f'http://{target}/'
+            future = executor.submit(lambda: http_get(get_url))
+            futures.append((get_url, future))
 
-        for future in futures:
+        for (get_url, future) in futures:
             result = future.result()
             is_ok = result.status_code == 200
             if not is_ok:
@@ -38,7 +39,9 @@ def create_application(app_name, dependencies=None):
     def ping():
         response_level = current_app.__response_level
         if response_level == ResponseLevel.NORMAL:
-            dependencies_ok = check_dependencies(current_app.__dependencies, current_app.__executor)
+            dependencies_ok = True
+            if 'ping' in request.path:
+                dependencies_ok = check_dependencies(current_app.__dependencies, current_app.__executor)
             message, code = ('OK', 200) if dependencies_ok else ('UNHEALTHY', 500)
             return Response(message, code)
 
@@ -47,7 +50,9 @@ def create_application(app_name, dependencies=None):
 
         else:
             sleep(5.0)
-            dependencies_ok = check_dependencies(current_app.__dependencies, current_app.__executor)
+            dependencies_ok = True
+            if 'ping' in request.path:
+                dependencies_ok = check_dependencies(current_app.__dependencies, current_app.__executor)
             message, code = ('OK', 200) if dependencies_ok else ('UNHEALTHY', 500)
             return Response(message, code)
 
@@ -76,7 +81,31 @@ class POCNodeStartable(object):
 
 
 def main():
-    pass
+    N = 5
+    names = ['app1','app2','app3','app4','app5']
+    ports = [5000, 5001, 5002, 5003, 5004]
+    edges = []
+
+    # Complete graph
+    for i in range(N):
+        for j in range(N):
+            if i == j:
+                continue
+            edges.append((i, j))
+
+    sorted_edges = sorted(edges)
+    adj_list = dict()
+    for (u, v) in sorted_edges:
+        adj_list[u] = [] if u not in adj_list else adj_list[u]
+        adj_list[u] += [v]
+
+    for i in range(N):
+        name = names[i]
+        port = ports[i]
+        dependencies = [f'127.0.0.1:{ports[x]}' for x in adj_list[i]]
+
+        app = POCNodeStartable(name, dependencies)
+        app.start(port=port)
 
 
 if __name__ == '__main__':
