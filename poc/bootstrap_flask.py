@@ -1,22 +1,31 @@
 from concurrent.futures import _base
 from concurrent.futures.thread import ThreadPoolExecutor
+from enum import Enum
 from threading import Thread
 from time import sleep
 from typing import Iterable
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, Response, current_app, request
 from requests import get as http_get
 
 from node import ResponseLevel, inverse_response_level
 
 
+class HealthStatus(Enum):
+    HEALTHY = 0
+    UNHEALTHY = 1
+
+
 def create_application(app_name, dependencies=None):
     dependencies = [] if dependencies is None else dependencies
 
     app = Flask(app_name)
-    app.__response_level = ResponseLevel.NORMAL
-    app.__dependencies = dependencies
-    app.__executor = ThreadPoolExecutor(max_workers=16)
+    with app.app_context():
+        current_app.__health_status = HealthStatus.HEALTHY
+        current_app.__response_level = ResponseLevel.NORMAL
+        current_app.__dependencies = dependencies
+        current_app.__executor = ThreadPoolExecutor(max_workers=16)
 
     # check dependencies must run asynchronously
     def check_dependencies(dependencies: Iterable[str], executor: _base.Executor) -> bool:
@@ -34,29 +43,31 @@ def create_application(app_name, dependencies=None):
 
         return True
 
+    def update_health_status(flask_app: Flask):
+        with flask_app.app_context():
+            if current_app.__response_level == ResponseLevel.NORMAL:
+                dependencies_ok = check_dependencies(current_app.__dependencies, current_app.__executor)
+                current_app.__health_status = HealthStatus.HEALTHY if dependencies_ok else HealthStatus.UNHEALTHY
+            elif current_app.__response_level == ResponseLevel.TERMINATED:
+                current_app.__health_status = HealthStatus.UNHEALTHY
+            else:
+                dependencies_ok = check_dependencies(current_app.__dependencies, current_app.__executor)
+                current_app.__health_status = HealthStatus.HEALTHY if dependencies_ok else HealthStatus.UNHEALTHY
+
+    cron = BackgroundScheduler()
+    cron.add_job(func=update_health_status, args=[app], trigger='interval', seconds=1)
+    cron.start()
+
     @app.route('/', methods=['GET'])
     @app.route('/ping', methods=['GET'])
     def ping():
         response_level = current_app.__response_level
-        if response_level == ResponseLevel.NORMAL:
-            dependencies_ok = True
-            # TODO: THIS IS WRONG, CIRCULAR DEPENDENCY SHOULD BE HANDLED NOT LIKE THIS.
-            # EACH NODE SHOULD USE INTERVAL TO CHECK OTHER DEPENDENCY, AND UPDATE THEIR CURRENT HEALTH STATUS
-            if 'ping' in request.path:
-                dependencies_ok = check_dependencies(current_app.__dependencies, current_app.__executor)
-            message, code = ('OK', 200) if dependencies_ok else ('UNHEALTHY', 500)
-            return Response(message, code)
-
-        elif response_level == ResponseLevel.TERMINATED:
-            return Response('UNHEALTHY', 500)
-
-        else:
+        if response_level == ResponseLevel.SLOW:
             sleep(5.0)
-            dependencies_ok = True
-            if 'ping' in request.path:
-                dependencies_ok = check_dependencies(current_app.__dependencies, current_app.__executor)
-            message, code = ('OK', 200) if dependencies_ok else ('UNHEALTHY', 500)
-            return Response(message, code)
+
+        health_status = current_app.__health_status
+        message, code = ('OK', 200) if health_status == HealthStatus.HEALTHY else ('UNHEALTHY', 500)
+        return Response(message, code)
 
     @app.route('/response/<level>', methods=['GET'])
     def set_response_level(level):
