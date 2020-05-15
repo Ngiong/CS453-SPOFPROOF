@@ -1,7 +1,7 @@
 from requests import get as http_get
 
 from node import INode, ResponseLevel
-from poc.bootstrap_flask import POCNodeStartable
+from bootstrap_flask import POCNodeStartable
 
 
 class POCNode(INode):
@@ -24,7 +24,7 @@ class POCNode(INode):
         return f'http://{self.ip_address}:{self.port}{path}'
 
     def ping(self) -> bool:
-        response = http_get(self.get_url('/'))
+        response = http_get(self.get_url('/ping'))
         return response.status_code == 200
 
     def set_response_level(self, response_level: ResponseLevel) -> bool:
