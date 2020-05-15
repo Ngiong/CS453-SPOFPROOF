@@ -36,13 +36,13 @@ class SimpleNodeStartable(INode, IStartable):
 
 
 def bootstrap():
-    parent1 = SimpleNodeStartable(name='parent 1', ip_address='localhost', port=3887)
+    parent1 = SimpleNodeStartable(name='parent 1', ip_address='127.0.0.1', port=3887)
     parent1.start()
 
-    parent2 = SimpleNodeStartable(name='parent 2', ip_address='localhost', port=3888)
+    parent2 = SimpleNodeStartable(name='parent 2', ip_address='127.0.0.1', port=3888)
     parent2.start()
 
-    dependant = SimpleNodeStartable(name='dependant', ip_address='localhost', port=3889)
+    dependant = SimpleNodeStartable(name='dependant', ip_address='127.0.0.1', port=3889)
     dependant.set_dependencies([parent1, parent2])
 
     dependant.start()

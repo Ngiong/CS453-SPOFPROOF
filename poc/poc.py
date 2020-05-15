@@ -99,7 +99,7 @@ class POCNodeStartable(object):
         dependencies = [] if dependencies is None else dependencies
         self.app = create_application(name, dependencies)
 
-    def start(self, host='localhost', port=5000):
+    def start(self, host='127.0.0.1', port=5000):
         # With Multi-Threading Apps, YOU CANNOT USE DEBUG! Though you can sub-thread.
         th = Thread(target=lambda: self.app.run(host, port, debug=False, threaded=True))
         th.start()
@@ -109,11 +109,11 @@ def main():
     app1 = POCNodeStartable('app1')
     app1.start(port=5000)
 
-    app2 = POCNodeStartable('app2', ['localhost:5000'])
+    app2 = POCNodeStartable('app2', ['127.0.0.1:5000'])
     app2.start(port=5001)
 
     # Test if the NodeStartable is running correctly
-    node1 = POCNode('app1', 'localhost', 5000)
+    node1 = POCNode('app1', '127.0.0.1', 5000)
     assert node1.ping()
 
     assert node1.set_response_level(ResponseLevel.TERMINATED)
@@ -123,7 +123,8 @@ def main():
     assert node1.ping()
 
     # Check dependency
-    node2 = POCNode('app2', 'localhost', 5001)
+    node2 = POCNode('app2', '127.0.0.1', 5001)
+    node1.set_response_level(ResponseLevel.NORMAL)
     assert node2.ping()
 
     node1.set_response_level(ResponseLevel.TERMINATED)

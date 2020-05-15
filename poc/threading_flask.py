@@ -20,7 +20,7 @@ class Application(object):
         self.app = create_application(name)
         self.name = name
 
-    def start(self, host='localhost', port=5000):
+    def start(self, host='127.0.0.1', port=5000):
         # With Multi-Threading Apps, YOU CANNOT USE DEBUG! Though you can sub-thread.
         th = threading.Thread(
             target=lambda: self.app.run(host, port, debug=False, threaded=True))
