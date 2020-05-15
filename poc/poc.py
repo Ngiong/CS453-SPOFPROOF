@@ -1,6 +1,7 @@
 from threading import Thread
 
 from flask import Flask, current_app
+from requests import get as http_get
 
 from bootstrap import IStartable
 from node import INode, ResponseLevel, inverse_response_level
@@ -22,14 +23,17 @@ class POCNode(INode):
     def get_name(self):
         return self.name
 
+    def get_url(self, path='/'):
+        return f'http://{self.ip_address}:{self.port}{path}'
+
     def ping(self) -> bool:
-        # TODO: when called, it will hit the ping API in the node
-        # TODO: (cont.d) then node will ping all of its dependencies
-        pass
+        response = http_get(self.get_url('/'))
+        return response.text == 'OK'
 
     def set_response_level(self, response_level: ResponseLevel) -> bool:
-        # TODO: when called, it will hit the set response level API in the node
-        pass
+        level = response_level.value
+        response = http_get(self.get_url(f'/response/{level}'))
+        return response.text == 'OK'
 
 
 def create_application(app_name):
@@ -39,8 +43,9 @@ def create_application(app_name):
     @app.route('/', methods=['GET'])
     @app.route('/ping', methods=['GET'])
     def ping():
-        response_level = current_app.__response_level
-        return 'OK ' + str(response_level)
+        # response_level = current_app.__response_level
+        # return 'OK ' + str(response_level)
+        return 'OK'
 
     @app.route('/response/<level>', methods=['GET'])
     def set_response_level(level):
@@ -77,6 +82,9 @@ def main():
 
     app2 = POCNodeStartable('app2')
     app2.start(port=5001)
+
+    node1 = POCNode('app1', 'localhost', 5000)
+    print(node1.ping())
 
 
 if __name__ == '__main__':
