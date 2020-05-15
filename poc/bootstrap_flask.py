@@ -40,6 +40,8 @@ def create_application(app_name, dependencies=None):
         response_level = current_app.__response_level
         if response_level == ResponseLevel.NORMAL:
             dependencies_ok = True
+            # TODO: THIS IS WRONG, CIRCULAR DEPENDENCY SHOULD BE HANDLED NOT LIKE THIS.
+            # EACH NODE SHOULD USE INTERVAL TO CHECK OTHER DEPENDENCY, AND UPDATE THEIR CURRENT HEALTH STATUS
             if 'ping' in request.path:
                 dependencies_ok = check_dependencies(current_app.__dependencies, current_app.__executor)
             message, code = ('OK', 200) if dependencies_ok else ('UNHEALTHY', 500)
