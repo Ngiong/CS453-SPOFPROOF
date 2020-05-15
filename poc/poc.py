@@ -1,6 +1,7 @@
 from threading import Thread
+from time import sleep
 
-from flask import Flask, current_app
+from flask import Flask, Response, current_app
 from requests import get as http_get
 
 from bootstrap import IStartable
@@ -28,12 +29,12 @@ class POCNode(INode):
 
     def ping(self) -> bool:
         response = http_get(self.get_url('/'))
-        return response.text == 'OK'
+        return response.status_code == 200
 
     def set_response_level(self, response_level: ResponseLevel) -> bool:
         level = response_level.value
         response = http_get(self.get_url(f'/response/{level}'))
-        return response.text == 'OK'
+        return response.status_code == 200
 
 
 def create_application(app_name):
@@ -43,9 +44,14 @@ def create_application(app_name):
     @app.route('/', methods=['GET'])
     @app.route('/ping', methods=['GET'])
     def ping():
-        # response_level = current_app.__response_level
-        # return 'OK ' + str(response_level)
-        return 'OK'
+        response_level = current_app.__response_level
+        if response_level == ResponseLevel.NORMAL:
+            return Response('OK', 200)
+        elif response_level == ResponseLevel.TERMINATED:
+            return Response('UNHEALTHY', 500)
+        else:
+            sleep(5.0)
+            return Response('OK', 200)
 
     @app.route('/response/<level>', methods=['GET'])
     def set_response_level(level):
@@ -84,7 +90,13 @@ def main():
     app2.start(port=5001)
 
     node1 = POCNode('app1', 'localhost', 5000)
-    print(node1.ping())
+    assert node1.ping()
+
+    assert node1.set_response_level(ResponseLevel.TERMINATED)
+    assert not node1.ping()
+
+    assert node1.set_response_level(ResponseLevel.SLOW)
+    assert node1.ping()
 
 
 if __name__ == '__main__':
