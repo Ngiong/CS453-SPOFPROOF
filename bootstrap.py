@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from node import SimpleNode
+from node import INode, ResponseLevel
+
 
 # TODO: if it is possible, we might want to be able to automatically start the microservice environment
 # This is just an example to bootstrap the microservice
@@ -11,8 +12,20 @@ class IStartable(ABC):
         pass
 
 
-class SimpleNodeStartable(SimpleNode, IStartable):
+class SimpleNodeStartable(INode, IStartable):
     dependencies = []
+
+    def __str__(self):
+        pass
+
+    def ping(self):
+        pass
+
+    def set_response_level(self: ResponseLevel):
+        pass
+
+    def get_name(self):
+        pass
 
     def set_dependencies(self, node):
         self.dependencies = ['{}:{}'.format(x.ip_address, x.port) for x in node]
