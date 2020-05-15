@@ -8,6 +8,16 @@ class ResponseLevel(Enum):
     TERMINATED = 2 # node cannot respond
 
 
+def inverse_response_level(level: int) -> ResponseLevel:
+    if level == 0:
+        return ResponseLevel.NORMAL
+    if level == 1:
+        return ResponseLevel.SLOW
+    if level == 2:
+        return ResponseLevel.TERMINATED
+    raise ValueError("Level must be in {0,1,2}")
+
+
 class INode(ABC):
     # Representation of microservices
     # Should use interface so that our project can be "extensible" for non-localhost

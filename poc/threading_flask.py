@@ -8,6 +8,7 @@ def create_application(app_name):
     app = Flask(app_name)
 
     @app.route('/', methods=['GET'])
+    @app.route('/ping', methods=['GET'])
     def hello():
         return 'Hello, World!' + ' from ' + app_name
 
