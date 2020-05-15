@@ -10,8 +10,12 @@ from requests import get as http_get
 from node import ResponseLevel, inverse_response_level
 
 
-def create_application(app_name, dependencies=None):
+PORT_APP = dict()
+
+
+def create_application(app_name: str, dependencies=None):
     dependencies = [] if dependencies is None else dependencies
+    app_name = app_name.replace(',', '_')
 
     app = Flask(app_name)
     app.__response_level = ResponseLevel.NORMAL
@@ -19,10 +23,13 @@ def create_application(app_name, dependencies=None):
     app.__executor = ThreadPoolExecutor(max_workers=16)
 
     # check dependencies must run asynchronously
-    def check_dependencies(dependencies: Iterable[str], executor: _base.Executor) -> bool:
+    def check_dependencies(visited: str, dependencies: Iterable[str], executor: _base.Executor) -> bool:
+        visited_set = set(visited.split(','))
+        filtered_dep = filter(lambda x: PORT_APP[int(x.split(':')[1])] not in visited_set, dependencies)
+
         futures = []
-        for target in dependencies:
-            get_url = f'http://{target}/'
+        for target in filtered_dep:
+            get_url = f'http://{target}/?from={visited}'
             future = executor.submit(lambda: http_get(get_url))
             futures.append((get_url, future))
 
@@ -37,13 +44,12 @@ def create_application(app_name, dependencies=None):
     @app.route('/', methods=['GET'])
     @app.route('/ping', methods=['GET'])
     def ping():
+        visited = request.args.get('from')
+        updated_visited = current_app.name + ('' if visited is None else (',' + visited))
+
         response_level = current_app.__response_level
         if response_level == ResponseLevel.NORMAL:
-            dependencies_ok = True
-            # TODO: THIS IS WRONG, CIRCULAR DEPENDENCY SHOULD BE HANDLED NOT LIKE THIS.
-            # EACH NODE SHOULD USE INTERVAL TO CHECK OTHER DEPENDENCY, AND UPDATE THEIR CURRENT HEALTH STATUS
-            if 'ping' in request.path:
-                dependencies_ok = check_dependencies(current_app.__dependencies, current_app.__executor)
+            dependencies_ok = check_dependencies(updated_visited, current_app.__dependencies, current_app.__executor)
             message, code = ('OK', 200) if dependencies_ok else ('UNHEALTHY', 500)
             return Response(message, code)
 
@@ -52,9 +58,7 @@ def create_application(app_name, dependencies=None):
 
         else:
             sleep(5.0)
-            dependencies_ok = True
-            if 'ping' in request.path:
-                dependencies_ok = check_dependencies(current_app.__dependencies, current_app.__executor)
+            dependencies_ok = check_dependencies(updated_visited, current_app.__dependencies, current_app.__executor)
             message, code = ('OK', 200) if dependencies_ok else ('UNHEALTHY', 500)
             return Response(message, code)
 
@@ -87,6 +91,9 @@ def main():
     names = ['app1','app2','app3','app4','app5']
     ports = [5000, 5001, 5002, 5003, 5004]
     edges = []
+
+    for (port, name) in zip(ports, names):
+        PORT_APP[port] = name
 
     # Complete graph
     for i in range(N):
