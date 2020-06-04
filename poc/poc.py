@@ -1,7 +1,7 @@
 from requests import get as http_get
 
 from node import INode, ResponseLevel
-from bootstrap_flask import POCNodeStartable
+from bootstrap_flask import POCNodeStartable, PORT_APP
 
 
 class POCNode(INode):
@@ -39,6 +39,12 @@ def main():
 
     app2 = POCNodeStartable('app2', ['127.0.0.1:5000'])
     app2.start(port=5001)
+
+    names = ['app1', 'app2']
+    ports = [5000, 5001]
+
+    for (port, name) in zip(ports, names):
+        PORT_APP[port] = name
 
     # Test if the NodeStartable is running correctly
     node1 = POCNode('app1', '127.0.0.1', 5000)
