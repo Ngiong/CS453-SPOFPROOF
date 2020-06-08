@@ -1,8 +1,9 @@
 from requests import get as http_get
 
+import sys
+sys.path.append(".")
 from node import INode, ResponseLevel
 from bootstrap_flask import POCNodeStartable, PORT_APP
-
 
 class POCNode(INode):
     name = ''
@@ -32,6 +33,11 @@ class POCNode(INode):
         response = http_get(self.get_url(f'/response/{level}'))
         return response.status_code == 200
 
+    def kill(self) -> bool:
+        return self.set_response_level(ResponseLevel.TERMINATED)
+
+    def resurrect(self) -> bool:
+        return self.set_response_level(ResponseLevel.NORMAL)
 
 def main():
     app1 = POCNodeStartable('app1')
@@ -63,7 +69,9 @@ def main():
 
     node1.set_response_level(ResponseLevel.TERMINATED)
     assert not node2.ping()
+    print("Test success")
+    node1.resurrect()
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
