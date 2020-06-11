@@ -16,25 +16,23 @@ class SPOFProofEngine:
     def run_test(self):
         # TODO: implementation of chaotic testing
         # TODO: kill a node, check all other, if it has dependency, add to dependency found
-        for node_name in self.nodes:
-            other_nodes = self.nodes.copy()
-            other_nodes.pop(node_name, None)
-            # dependency_list = []
-            # Kill a node
-            curr_node = self.nodes[node_name]
-            curr_node.kill()
-            # Ping every remaining node
-            for node in other_nodes:
-                # If ping doesnt work, then this has dependency
-                if not other_nodes[node].ping():
-                    if node in self.dependency_found:
-                        self.dependency_found[node].append(node_name)
-                    else:
-                        self.dependency_found[node] = [node_name]
-                    # dependency_list.append(node)
-            #Add the dependency list into the dict
-            # self.dependency_found[node_name] = dependency_list
-            curr_node.resurrect()
+        for i in range(10): 
+            for node_name in self.nodes:
+                other_nodes = self.nodes.copy()
+                other_nodes.pop(node_name, None)
+                # dependency_list = []
+                # Kill a node
+                curr_node = self.nodes[node_name]
+                curr_node.kill()
+                # Ping every remaining node
+                for node in other_nodes:
+                    # If ping doesnt work, then this has dependency
+                    if not other_nodes[node].ping():
+                        if node in self.dependency_found and (node_name not in self.dependency_found[node]):
+                            self.dependency_found[node].append(node_name)
+                        elif node not in self.dependency_found:
+                            self.dependency_found[node] = [node_name]
+                curr_node.resurrect()
 
     def print_dependency(self):
         print(self.dependency_found)
