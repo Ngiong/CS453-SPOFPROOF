@@ -1,16 +1,11 @@
 import pydot
 import os
-import tkinter as tk
 import threading
 import time
 from poc.poc import POCNode
-from PIL import Image, ImageTk
+from PIL import Image
 import matplotlib.pyplot as plt
-from io import BytesIO 
 import matplotlib.image as mpimg
-
-
-
 
 
 #create graph object
@@ -22,16 +17,12 @@ class Node_Graph():
     def __init__(self, name ): 
         self.name = name
         self.G = pydot.Dot(graph_type="digraph")
-        """ self.figure = plt.figure()  
-        self.axes = self.figure.add_subplot(111) """
         X = [[1],[1]]# sample 2D array
-        """ self.figure = plt.imshow(X)
-        self.axes = self.figure  """
         self.figure= plt.imshow(X, aspect='auto')
         plt.axis("off")
         plt.ion()
-        """ plt.show()
-        plt.pause(0.001)   """
+        self.gui_thread = threading.Thread(target=self.show_matplot)
+
 
     def set_target_node(self, node):
 
@@ -60,16 +51,27 @@ class Node_Graph():
         self.G.write_png(path)
 
     def show_matplot(self):
-        print("called")
-        img = mpimg.imread('./pic.png')
-        self.figure.set_data(img)
-        
-        plt.show()
-        plt.pause(0.001)
-        print("plotted")        
+        t = threading.currentThread()
+        while getattr(t, "do_run", True):
+            print("called")
+            img = mpimg.imread('./pic.png')
+            self.figure.set_data(img)
+            plt.show()
+            plt.pause(0.001)
+            print("plotted")     
+        print("Stopping as you wish.")   
      
 
 
+        
+
+    def gui_thread_start(self):
+        self.gui_thread.start()
+        #threading.Thread(target=self.show_matplot).start()
+
+    def gui_thread_stop(self):
+        self.gui_thread.do_run = False
+        self.gui_thread.join()
 
 
 def testing(): 
@@ -85,14 +87,16 @@ def testing():
     graph.set_target_node(node1)
     graph.add_edge(node1,node2)
     graph.save_graph("./pic")
-    graph.show_matplot()
+    graph.gui_thread_start()
     time.sleep(2)
     graph.set_target_node(node2)
     graph.save_graph("./pic.png")
+    
+    
+
     time.sleep(2)
-    graph.show_matplot()
 
 
-
+    graph.gui_thread_stop()
 if __name__ == '__main__':
     testing()
