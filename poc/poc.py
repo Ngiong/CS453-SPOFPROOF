@@ -3,7 +3,7 @@ from requests import get as http_get
 import sys
 sys.path.append(".")
 from node import INode, ResponseLevel
-from bootstrap_flask import POCNodeStartable, PORT_APP
+from poc.bootstrap_flask import POCNodeStartable, PORT_APP
 
 class POCNode(INode):
     name = ''
