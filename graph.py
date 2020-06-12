@@ -12,13 +12,13 @@ import matplotlib.image as mpimg
 class Node_Graph():
     name = ''
     G = None
-    target = ""
+    target_node = ""
 
     def __init__(self, name ): 
         self.name = name
         self.G = pydot.Dot(graph_type="digraph")
-        X = [[1],[1]]# sample 2D array
-        self.figure= plt.imshow(X, aspect='auto')
+        X = [[1]]# sample 2D array
+        self.figure= plt.imshow(X, aspect='equal')
         plt.axis("off")
         plt.ion()
         self.gui_thread = threading.Thread(target=self.show_matplot)
@@ -26,9 +26,9 @@ class Node_Graph():
 
     def set_target_node(self, node):
 
-        # get current target and reset color
-        if self.target != "":
-            current = self.G.get_node(self.target)
+        # get current target_node and reset color
+        if self.target_node != "":
+            current = self.G.get_node(self.target_node)
             print(current)
             current[0].set_style("None")
 
@@ -36,13 +36,20 @@ class Node_Graph():
         graph_node[0].set_style("filled")
         graph_node[0].set_fillcolor("red")
 
-        self.target = node.name
+        self.target_node = node.name
+
+    def set_edge_color(self, src, dest, color):
+        edge = self.G.get_edge(src.name, dest.name)
+        print(edge)
+        if len(edge) > 0:
+            print("change edge color")
+            edge[0].set_color(color)
 
     def add_node(self, node):
         self.G.add_node(pydot.Node(node.name))
 
     def add_edge(self, node1, node2):
-        edge = pydot.Edge(node1.name, node2.name, color="blue")
+        edge = pydot.Edge(node1.name, node2.name)  #, color="blue"
         self.G.add_edge(edge)
 
     def save_graph(self, path):
@@ -53,17 +60,15 @@ class Node_Graph():
     def show_matplot(self):
         t = threading.currentThread()
         while getattr(t, "do_run", True):
-            print("called")
+            #print("called")
             img = mpimg.imread('./pic.png')
             self.figure.set_data(img)
             plt.show()
             plt.pause(0.001)
-            print("plotted")     
-        print("Stopping as you wish.")   
+            #print("plotted")     
+        #print("Stopping as you wish.")   
      
 
-
-        
 
     def gui_thread_start(self):
         self.gui_thread.start()
@@ -91,11 +96,15 @@ def testing():
     time.sleep(2)
     graph.set_target_node(node2)
     graph.save_graph("./pic.png")
-    
-    
-
     time.sleep(2)
 
+    graph.add_edge(node2,node3)
+    graph.save_graph("./pic.png")
+    time.sleep(2)
+
+    graph.set_edge_color(node2,node3,"green")
+    graph.save_graph("./pic.png")
+    time.sleep(2)
 
     graph.gui_thread_stop()
 if __name__ == '__main__':
