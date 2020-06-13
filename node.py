@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from enum import Enum
+from requests import get as http_get
+from threading import Thread
 
 
 class ResponseLevel(Enum):
@@ -54,11 +56,23 @@ class SimpleNode(INode):
     def get_name(self):
         return self.name
 
-    def ping(self):
+    def get_url(self, path='/'):
+        return f'http://{self.ip_address}:{self.port}{path}'
+
+    def ping(self) -> bool:
         # TODO: when called, it will hit the ping API in the node
         # TODO: (cont.d) then node will ping all of its dependencies
-        pass
+        response = http_get(self.get_url('/ping'))
+        return response.status_code == 200
 
-    def set_response_level(self: ResponseLevel):
+    def set_response_level(self, response_level: ResponseLevel):
         # TODO: when called, it will hit the set response level API in the node
-        pass
+        level = response_level.value
+        response = http_get(self.get_url(f'/response/{level}'))
+        return response.status_code == 200   
+
+    def kill(self) -> bool:
+        return self.set_response_level(ResponseLevel.TERMINATED)
+
+    def resurrect(self) -> bool:
+        return self.set_response_level(ResponseLevel.NORMAL)
