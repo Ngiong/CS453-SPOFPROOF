@@ -1,3 +1,4 @@
+import time
 from concurrent.futures import _base
 from concurrent.futures.thread import ThreadPoolExecutor
 from threading import Thread
@@ -85,7 +86,7 @@ class SimpleNodeStartable(object):
         th.start()
 
 
-def bootstrap(graph=None, names=None):
+def bootstrap(graph=None):
     """
     Constructs startrable POCNode, and return the list of nodes
     @param graph:
@@ -101,8 +102,6 @@ def bootstrap(graph=None, names=None):
 
     if graph is None:
         graph = {}
-    if names is None:
-        names = {}
 
     host = '127.0.0.1'
     name_and_address = []
@@ -124,12 +123,19 @@ def bootstrap(graph=None, names=None):
         PORT_APP[port] = node_name
 
     # create Node
+    time.sleep(1)
+    print(f'''
+!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! BOOTSTRAP SUCCESSFUL !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!
+''')
     nodes = []
-    for ele in name_and_address:
-        name = ele[0]
-        port = ele[1].split(":")[1]
+    for (node_name, address) in name_and_address:
+        name = node_name
+        port = address.split(":")[1]
         port = int(port)
-        nodes.append(SimpleNode(name, host, port))
+        # nodes.append(SimpleNode(name, host, port))
+        print(f'[INFO] {name} is running on {host} (PORT: {port})')
 
     # return [node_list]
     return nodes
@@ -142,13 +148,7 @@ if __name__ == '__main__':
         3: {},
         4: {}
     }
-    names = {
-        1: 'app1',
-        2: 'app2',
-        3: 'app3',
-        4: 'app4',
-    }
-    nodes = bootstrap(graph, names)
+    nodes = bootstrap(graph)
 
     # for ele in nodes:
     #     assert(ele.ping())
