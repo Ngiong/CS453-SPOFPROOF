@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>SPOOFPROOF</title>
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="https://use.fontawesome.com/releases/v5.0.8/css/all.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+  </head>
+  <body onload="updateImage();">
+    <div id="div_content">
+      <h1>SPOOFPROOF</h1>
+      <img name="graph" src="./pic.png" alt="Italian Trulli">
+    </div>
+  </body>
+</html>
+
+<script language="javascript">
+
+    function updateImage() {
+    
+       obj = document.graph;
+    
+       obj.src = obj.src.split("?")[0] + "?" + new Date().getTime();
+    
+       //Following statement sets the delay before the function will
+    
+       //call itself again (in milliseconds)
+    
+       setTimeout("updateImage()",3000);
+    
+    }
+    
+    </script>

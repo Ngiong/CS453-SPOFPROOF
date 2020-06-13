@@ -17,9 +17,15 @@ class Node_Graph():
     def __init__(self, name ): 
         self.name = name
         self.G = pydot.Dot(graph_type="digraph")
-        X = [[1]]# sample 2D array
-        self.figure= plt.imshow(X, aspect='equal')
-        plt.axis("off")
+        self.G.set_size("9,15\!")
+        self.G.set_dpi(100)
+        
+        self.G.write_png("./init.png")
+        img = mpimg.imread('./init.png')
+        #X = [[1]]# sample 2D array
+        self.figure= plt.imshow(img, aspect=1)  #, aspect='auto'
+        #plt.axis("scaled")
+        #plt.axis("off")
         plt.ion()
         self.gui_thread = threading.Thread(target=self.show_matplot)
 
@@ -62,7 +68,8 @@ class Node_Graph():
         while getattr(t, "do_run", True):
             #print("called")
             img = mpimg.imread('./pic.png')
-            self.figure.set_data(img)
+            #self.figure.set_data(img)
+            plt.figure(img)
             plt.show()
             plt.pause(0.001)
             #print("plotted")     
@@ -92,7 +99,7 @@ def testing():
     graph.set_target_node(node1)
     graph.add_edge(node1,node2)
     graph.save_graph("./pic")
-    graph.gui_thread_start()
+    #graph.gui_thread_start()
     time.sleep(2)
     graph.set_target_node(node2)
     graph.save_graph("./pic.png")
@@ -106,6 +113,6 @@ def testing():
     graph.save_graph("./pic.png")
     time.sleep(2)
 
-    graph.gui_thread_stop()
+    #graph.gui_thread_stop()
 if __name__ == '__main__':
     testing()
