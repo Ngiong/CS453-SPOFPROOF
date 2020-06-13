@@ -9,7 +9,7 @@ class SPOFProofEngine:
         for inode in inodes:
             self.nodes[inode.get_name()] = inode
 
-    def run_test(self):
+    def run_test(self, n_tests=1):
         for node_name in self.nodes:
             other_nodes = self.nodes.copy()
             other_nodes.pop(node_name, None)
@@ -19,20 +19,25 @@ class SPOFProofEngine:
             curr_node.kill()
 
             # Ping every remaining node
-            for node in other_nodes:
+            for other_node in other_nodes:
+
                 # If ping doesnt work, then this has dependency
-                if not other_nodes[node].ping():
-                    if node in self.dependency_found and (node_name not in self.dependency_found[node]):
-                        self.dependency_found[node].append(node_name)
-                    elif node not in self.dependency_found:
-                        self.dependency_found[node] = [node_name]
+                other_inode = other_nodes[other_node]
+                has_dependency = False
+                for i in range(n_tests):
+                    is_healthy = other_inode.ping()
+                    has_dependency |= not is_healthy
+                    if has_dependency:
+                        break
+
+                if has_dependency:
+                    if other_node in self.dependency_found:
+                        self.dependency_found[other_node].append(node_name)
+                    elif other_node not in self.dependency_found:
+                        self.dependency_found[other_node] = [node_name]
 
             # Resurrect the node
             curr_node.resurrect()
-
-    def run_repeated_test(self, n_tests=10):
-        for i in range(n_tests):
-            self.run_test()
 
     def print_dependency(self):
         print(self.dependency_found)
@@ -54,7 +59,7 @@ def main():
     # Test the engine
     engine = SPOFProofEngine()
     engine.set_nodes(nodes)
-    engine.run_repeated_test()
+    engine.run_test(n_tests=10)
     engine.print_dependency()
 
 
