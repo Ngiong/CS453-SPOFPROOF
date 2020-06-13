@@ -8,27 +8,26 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 
-#create graph object
+# create graph object
 class Node_Graph():
     name = ''
     G = None
     target_node = ""
 
-    def __init__(self, name ): 
+    def __init__(self, name):
         self.name = name
         self.G = pydot.Dot(graph_type="digraph")
         self.G.set_size("9,15\!")
         self.G.set_dpi(100)
-        
+
         self.G.write_png("./init.png")
         img = mpimg.imread('./init.png')
-        #X = [[1]]# sample 2D array
-        self.figure= plt.imshow(img, aspect=1)  #, aspect='auto'
-        #plt.axis("scaled")
-        #plt.axis("off")
+        # X = [[1]]# sample 2D array
+        self.figure = plt.imshow(img, aspect=1)  # , aspect='auto'
+        # plt.axis("scaled")
+        # plt.axis("off")
         plt.ion()
         self.gui_thread = threading.Thread(target=self.show_matplot)
-
 
     def set_target_node(self, node):
 
@@ -55,7 +54,7 @@ class Node_Graph():
         self.G.add_node(pydot.Node(node.name))
 
     def add_edge(self, node1, node2):
-        edge = pydot.Edge(node1.name, node2.name)  #, color="blue"
+        edge = pydot.Edge(node1.name, node2.name)  # , color="blue"
         self.G.add_edge(edge)
 
     def save_graph(self, path):
@@ -66,27 +65,25 @@ class Node_Graph():
     def show_matplot(self):
         t = threading.currentThread()
         while getattr(t, "do_run", True):
-            #print("called")
+            # print("called")
             img = mpimg.imread('./pic.png')
-            #self.figure.set_data(img)
+            # self.figure.set_data(img)
             plt.figure(img)
             plt.show()
             plt.pause(0.001)
-            #print("plotted")     
-        #print("Stopping as you wish.")   
-     
-
+            # print("plotted")
+        # print("Stopping as you wish.")
 
     def gui_thread_start(self):
         self.gui_thread.start()
-        #threading.Thread(target=self.show_matplot).start()
+        # threading.Thread(target=self.show_matplot).start()
 
     def gui_thread_stop(self):
         self.gui_thread.do_run = False
         self.gui_thread.join()
 
 
-def testing(): 
+def testing():
     print("Hello world")
     graph = Node_Graph("testgraph")
     node1 = POCNode('app1', '127.0.0.1', 5000)
@@ -97,22 +94,24 @@ def testing():
     graph.add_node(node2)
     graph.add_node(node3)
     graph.set_target_node(node1)
-    graph.add_edge(node1,node2)
+    graph.add_edge(node1, node2)
     graph.save_graph("./pic")
-    #graph.gui_thread_start()
+    # graph.gui_thread_start()
     time.sleep(2)
     graph.set_target_node(node2)
     graph.save_graph("./pic.png")
     time.sleep(2)
 
-    graph.add_edge(node2,node3)
+    graph.add_edge(node2, node3)
     graph.save_graph("./pic.png")
     time.sleep(2)
 
-    graph.set_edge_color(node2,node3,"green")
+    graph.set_edge_color(node2, node3, "green")
     graph.save_graph("./pic.png")
     time.sleep(2)
 
-    #graph.gui_thread_stop()
+    # graph.gui_thread_stop()
+
+
 if __name__ == '__main__':
     testing()
