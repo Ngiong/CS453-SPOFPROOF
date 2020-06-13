@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
 from node import INode, ResponseLevel
-
+import sys
+sys.path.append("poc/")
+from poc.poc import POCNode
+from poc.bootstrap_flask import POCNodeStartable, PORT_APP
+import random
 
 # TODO: if it is possible, we might want to be able to automatically start the microservice environment
 # This is just an example to bootstrap the microservice
@@ -35,18 +39,76 @@ class SimpleNodeStartable(INode, IStartable):
         pass
 
 
-def bootstrap():
-    parent1 = SimpleNodeStartable(name='parent 1', ip_address='127.0.0.1', port=3887)
-    parent1.start()
+def bootstrap(graph:{}):
+    """
+    Constructs startrable POCNode, and return the list of nodes
+    @param graph:
+        A dependency graph that looks like:{v:{v1,v2}}
+        v: node number
+        v1,v2: node numbers that influence node v
+        if v has no dependent nodes, {v:{}}
+    @return:
+        Startable Node list
+    """
+    host = '127.0.0.1'
+    name_and_address = []
+    dependencies = dict()
+    for k,v in graph.items():
+        node_name = "app"+str(k)
+        port = 5000 + int(k)
+        address = host + ':' + str(port)
+        name_and_address.append((node_name, address))
+        dependencies[node_name] = []
+        for dependent in v:
+            if k == dependent:
+                continue
+            dependencies[node_name].append(host+':'+str(5000+int(dependent)))
+        if len(dependencies[node_name]) == 0:
+            POCNodeStartable(node_name).start(port=port)
+        else:
+            POCNodeStartable(node_name, dependencies[node_name]).start(port=port)
+        PORT_APP[port] = node_name
 
-    parent2 = SimpleNodeStartable(name='parent 2', ip_address='127.0.0.1', port=3888)
-    parent2.start()
+    # create Node
+    nodes = []
+    for ele in name_and_address:
+        name = ele[0]
+        port = ele[1].split(":")[1]
+        port = int(port)
+        nodes.append(POCNode(name, host, port))
 
-    dependant = SimpleNodeStartable(name='dependant', ip_address='127.0.0.1', port=3889)
-    dependant.set_dependencies([parent1, parent2])
-
-    dependant.start()
+    # return [node_list]
+    return nodes
 
 
+def construct_random_graph():
+    N = random.randint(1,1000)
+    graph = {}
+    for i in range(N):
+        dependencies = []
+        for j in range(N):
+            if j == i:
+                continue
+            if round(random.random()) == 0:
+                dependencies.append(j)
+        graph[i] = dependencies
+    return graph
 if __name__ == '__main__':
-    bootstrap()
+    graph = {1:{2,3},2:{4},3:{},4:{}}
+    nodes = bootstrap(graph)
+    for ele in nodes:
+        assert(ele.ping())
+    # direct releationship
+    nodes[1].set_response_level(ResponseLevel.TERMINATED) # terminate node 2
+    assert not nodes[0].ping()
+    # recover
+    nodes[1].resurrect()
+    assert nodes[0].ping()
+    # indirect relationship
+    nodes[3].set_response_level(ResponseLevel.TERMINATED)  # terminate node 4
+    assert not nodes[0].ping()
+
+    # graph = construct_random_graph()
+    # nodes = bootstrap(graph)
+    # for ele in nodes:
+    #     assert ele.ping()
