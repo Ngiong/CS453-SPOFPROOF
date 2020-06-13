@@ -7,6 +7,8 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
+import webbrowser as web
+
 
 #create graph object
 class Node_Graph():
@@ -87,6 +89,7 @@ class Node_Graph():
 
 
 def testing(): 
+    web.open(os.path.dirname(os.path.realpath(__file__))+"/Spoofproof.html")
     print("Hello world")
     graph = Node_Graph("testgraph")
     node1 = POCNode('app1', '127.0.0.1', 5000)
