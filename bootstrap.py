@@ -8,7 +8,8 @@ from typing import Iterable
 from flask import Flask, Response, current_app, request
 from requests import get as http_get
 
-from node import ResponseLevel, inverse_response_level, SimpleNode
+from node import ResponseLevel, inverse_response_level
+
 
 PORT_APP = dict()
 
@@ -87,58 +88,43 @@ class SimpleNodeStartable(object):
 
 
 def bootstrap(graph=None):
-    """
-    Constructs startrable POCNode, and return the list of nodes
-    @param graph:
-        A dependency graph that looks like:{v:{v1,v2}}
-        v: node number
-        v1,v2: node numbers that influence node v
-        if v has no dependent nodes, {v:{}}
-    @return:
-        Startable Node list
-    """
-    # for (port, name) in zip(ports, names):
-    #     PORT_APP[port] = name
-
     if graph is None:
         graph = {}
 
     host = '127.0.0.1'
     name_and_address = []
     dependencies = dict()
-    for k, v in graph.items():
-        node_name = "app" + str(k)
-        port = 5000 + int(k)
+
+    for node, node_dependencies in graph.items():
+        node_name = "app" + str(node)
+        port = 5000 + int(node)
         address = host + ':' + str(port)
         name_and_address.append((node_name, address))
         dependencies[node_name] = []
-        for dependent in v:
-            if k == dependent:
+
+        for dep in node_dependencies:
+            if node == dep:
                 continue
-            dependencies[node_name].append(host + ':' + str(5000 + int(dependent)))
+            dependencies[node_name].append(host + ':' + str(5000 + int(dep)))
+
         if len(dependencies[node_name]) == 0:
             SimpleNodeStartable(node_name).start(port=port)
         else:
             SimpleNodeStartable(node_name, dependencies[node_name]).start(port=port)
+
         PORT_APP[port] = node_name
 
-    # create Node
     time.sleep(1)
     print(f'''
 !!!!!!!!!!!!!!!!!!!!!!!!!!
 !! BOOTSTRAP SUCCESSFUL !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!
 ''')
-    nodes = []
     for (node_name, address) in name_and_address:
         name = node_name
         port = address.split(":")[1]
         port = int(port)
-        # nodes.append(SimpleNode(name, host, port))
         print(f'[INFO] {name} is running on {host} (PORT: {port})')
-
-    # return [node_list]
-    return nodes
 
 
 if __name__ == '__main__':
@@ -148,21 +134,4 @@ if __name__ == '__main__':
         3: {},
         4: {}
     }
-    nodes = bootstrap(graph)
-
-    # for ele in nodes:
-    #     assert(ele.ping())
-    # # direct releationship
-    # nodes[1].set_response_level(ResponseLevel.TERMINATED) # terminate node 2
-    # assert not nodes[0].ping()
-    # # recover
-    # nodes[1].resurrect()
-    # assert nodes[0].ping()
-    # # indirect relationship
-    # nodes[3].set_response_level(ResponseLevel.TERMINATED)  # terminate node 4
-    # assert not nodes[0].ping()
-
-    # graph = construct_random_graph()
-    # nodes = bootstrap(graph)
-    # for ele in nodes:
-    #     assert ele.ping()
+    bootstrap(graph)
