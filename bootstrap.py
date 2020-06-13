@@ -48,7 +48,7 @@ def bootstrap(graph:{}):
         v1,v2: node numbers that influence node v
         if v has no dependent nodes, {v:{}}
     @return:
-        True if the function f is nonzero polynomial, False otherwise.
+        Startable Node list
     """
     host = '127.0.0.1'
     name_and_address = []
@@ -94,21 +94,21 @@ def construct_random_graph():
         graph[i] = dependencies
     return graph
 if __name__ == '__main__':
-    # graph = {1:{2,3},2:{4},3:{},4:{}}
-    # nodes = bootstrap(graph)
-    # for ele in nodes:
-    #     assert(ele.ping())
-    # # direct releationship
-    # nodes[1].set_response_level(ResponseLevel.TERMINATED) # terminate node 2
-    # assert not nodes[0].ping()
-    # # recover
-    # nodes[1].resurrect()
-    # assert nodes[0].ping()
-    # # indirect relationship
-    # nodes[3].set_response_level(ResponseLevel.TERMINATED)  # terminate node 4
-    # assert not nodes[0].ping()
-
-    graph = construct_random_graph()
+    graph = {1:{2,3},2:{4},3:{},4:{}}
     nodes = bootstrap(graph)
     for ele in nodes:
-        assert ele.ping()
+        assert(ele.ping())
+    # direct releationship
+    nodes[1].set_response_level(ResponseLevel.TERMINATED) # terminate node 2
+    assert not nodes[0].ping()
+    # recover
+    nodes[1].resurrect()
+    assert nodes[0].ping()
+    # indirect relationship
+    nodes[3].set_response_level(ResponseLevel.TERMINATED)  # terminate node 4
+    assert not nodes[0].ping()
+
+    # graph = construct_random_graph()
+    # nodes = bootstrap(graph)
+    # for ele in nodes:
+    #     assert ele.ping()
