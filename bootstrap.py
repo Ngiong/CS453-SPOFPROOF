@@ -23,20 +23,27 @@ def create_application(app_name: str, dependencies=None):
     app.__dependencies = dependencies
     app.__executor = ThreadPoolExecutor(max_workers=16)
 
-    # check dependencies must run asynchronously
+    # check dependencies should run asynchronously
     def check_dependencies(visited: str, dependencies: Iterable[str], executor: _base.Executor) -> bool:
         visited_set = set(visited.split(','))
         filtered_dep = filter(lambda x: PORT_APP[int(x.split(':')[1])] not in visited_set, dependencies)
 
-        futures = []
+        # futures = []
+        # for target in filtered_dep:
+        #     get_url = f'http://{target}/?from={visited}'
+        #     future = executor.submit(lambda: http_get(get_url))
+        #     futures.append((get_url, future))
+        #
+        # for (get_url, future) in futures:
+        #     result = future.result()
+        #     is_ok = result.status_code == 200
+        #     if not is_ok:
+        #         return False
+
         for target in filtered_dep:
             get_url = f'http://{target}/?from={visited}'
-            future = executor.submit(lambda: http_get(get_url))
-            futures.append((get_url, future))
-
-        for (get_url, future) in futures:
-            result = future.result()
-            is_ok = result.status_code == 200
+            response = http_get(get_url)
+            is_ok = response.status_code == 200
             if not is_ok:
                 return False
 
