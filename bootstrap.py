@@ -9,7 +9,6 @@ from requests import get as http_get
 
 from node import ResponseLevel, inverse_response_level, SimpleNode
 
-
 PORT_APP = dict()
 
 
@@ -86,7 +85,7 @@ class SimpleNodeStartable(object):
         th.start()
 
 
-def bootstrap(graph:{}):
+def bootstrap(graph=None, names=None):
     """
     Constructs startrable POCNode, and return the list of nodes
     @param graph:
@@ -100,11 +99,16 @@ def bootstrap(graph:{}):
     # for (port, name) in zip(ports, names):
     #     PORT_APP[port] = name
 
+    if graph is None:
+        graph = {}
+    if names is None:
+        names = {}
+
     host = '127.0.0.1'
     name_and_address = []
     dependencies = dict()
-    for k,v in graph.items():
-        node_name = "app"+str(k)
+    for k, v in graph.items():
+        node_name = "app" + str(k)
         port = 5000 + int(k)
         address = host + ':' + str(port)
         name_and_address.append((node_name, address))
@@ -112,7 +116,7 @@ def bootstrap(graph:{}):
         for dependent in v:
             if k == dependent:
                 continue
-            dependencies[node_name].append(host+':'+str(5000+int(dependent)))
+            dependencies[node_name].append(host + ':' + str(5000 + int(dependent)))
         if len(dependencies[node_name]) == 0:
             SimpleNodeStartable(node_name).start(port=port)
         else:
@@ -132,19 +136,31 @@ def bootstrap(graph:{}):
 
 
 if __name__ == '__main__':
-    graph = {1:{2,3},2:{4},3:{},4:{}}
-    nodes = bootstrap(graph)
-    for ele in nodes:
-        assert(ele.ping())
-    # direct releationship
-    nodes[1].set_response_level(ResponseLevel.TERMINATED) # terminate node 2
-    assert not nodes[0].ping()
-    # recover
-    nodes[1].resurrect()
-    assert nodes[0].ping()
-    # indirect relationship
-    nodes[3].set_response_level(ResponseLevel.TERMINATED)  # terminate node 4
-    assert not nodes[0].ping()
+    graph = {
+        1: {2, 3},
+        2: {4},
+        3: {},
+        4: {}
+    }
+    names = {
+        1: 'app1',
+        2: 'app2',
+        3: 'app3',
+        4: 'app4',
+    }
+    nodes = bootstrap(graph, names)
+
+    # for ele in nodes:
+    #     assert(ele.ping())
+    # # direct releationship
+    # nodes[1].set_response_level(ResponseLevel.TERMINATED) # terminate node 2
+    # assert not nodes[0].ping()
+    # # recover
+    # nodes[1].resurrect()
+    # assert nodes[0].ping()
+    # # indirect relationship
+    # nodes[3].set_response_level(ResponseLevel.TERMINATED)  # terminate node 4
+    # assert not nodes[0].ping()
 
     # graph = construct_random_graph()
     # nodes = bootstrap(graph)
