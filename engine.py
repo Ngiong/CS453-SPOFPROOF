@@ -1,8 +1,4 @@
-from node import INode, ResponseLevel
-import sys
-sys.path.append("poc")
-from poc.poc import POCNode
-from poc.bootstrap_flask import POCNodeStartable, PORT_APP
+from node import INode, SimpleNode
 
 
 class SPOFProofEngine:
@@ -44,10 +40,10 @@ class SPOFProofEngine:
 
 def main():
     # Initialize node for test
-    node1 = POCNode('app1', '127.0.0.1', 5001)
-    node2 = POCNode('app2', '127.0.0.1', 5002)
-    node3 = POCNode('app3', '127.0.0.1', 5003)
-    node4 = POCNode('app4', '127.0.0.1', 5004)
+    node1 = SimpleNode('app1', '127.0.0.1', 5001)
+    node2 = SimpleNode('app2', '127.0.0.1', 5002)
+    node3 = SimpleNode('app3', '127.0.0.1', 5003)
+    node4 = SimpleNode('app4', '127.0.0.1', 5004)
 
     nodes = [node1, node2, node3, node4]
 
