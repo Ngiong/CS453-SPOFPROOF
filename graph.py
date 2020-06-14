@@ -13,7 +13,7 @@ class Node_Graph():
     current_edge_test = None
 
     def __init__(self):
-        self.G = pydot.Dot(graph_type="digraph")
+        self.G = pydot.Dot(graph_type="digraph", prog='neato')
         self.G.set_size("9,15\!")
         self.G.set_dpi(100)
 
@@ -24,7 +24,7 @@ class Node_Graph():
         # plt.axis("scaled")
         # plt.axis("off")
         plt.ion()
-        self.gui_thread = threading.Thread(target=self.show_matplot)
+        # self.gui_thread = threading.Thread(target=self.show_matplot)
 
     def set_target_node(self, node_name):
         # get current target_node and reset color
@@ -41,11 +41,15 @@ class Node_Graph():
     def set_edge_color(self, src, dest, color):
         edge = self.G.get_edge(src, dest)
         if len(edge) > 0:
-            # print("change edge color")
             edge[0].set_color(color)
 
-    def add_node(self, node_name):
-        self.G.add_node(pydot.Node(node_name))
+    def add_node(self, node_name, pos=None):
+        if pos is None:
+            self.G.add_node(pydot.Node(node_name))
+        else:
+            x, y = pos
+            node = pydot.Node(node_name, x=x, y=y)
+            self.G.add_node(node)
 
     def add_edge(self, node1, node2):
         edge = pydot.Edge(node1, node2)  # , color="blue"
@@ -59,25 +63,25 @@ class Node_Graph():
             path += ".png"
         self.G.write_png(path)
 
-    def show_matplot(self):
-        t = threading.currentThread()
-        while getattr(t, "do_run", True):
-            # print("called")
-            img = mpimg.imread('./__pic.png')
-            # self.figure.set_data(img)
-            plt.figure(img)
-            plt.show()
-            plt.pause(0.001)
-            # print("plotted")
-        # print("Stopping as you wish.")
-
-    def gui_thread_start(self):
-        self.gui_thread.start()
-        # threading.Thread(target=self.show_matplot).start()
-
-    def gui_thread_stop(self):
-        self.gui_thread.do_run = False
-        self.gui_thread.join()
+    # def show_matplot(self):
+    #     t = threading.currentThread()
+    #     while getattr(t, "do_run", True):
+    #         # print("called")
+    #         img = mpimg.imread('./__pic.png')
+    #         # self.figure.set_data(img)
+    #         plt.figure(img)
+    #         plt.show()
+    #         plt.pause(0.001)
+    #         # print("plotted")
+    #     # print("Stopping as you wish.")
+    #
+    # def gui_thread_start(self):
+    #     self.gui_thread.start()
+    #     # threading.Thread(target=self.show_matplot).start()
+    #
+    # def gui_thread_stop(self):
+    #     self.gui_thread.do_run = False
+    #     self.gui_thread.join()
 
 
 class GraphVisualizer:
@@ -92,7 +96,7 @@ class GraphVisualizer:
     def flush(self):
         if self.enabled:
             self.graph.save_graph(self.target_img)
-            time.sleep(0.5)
+            time.sleep(2)
 
     def draw_initialize(self, node_names=None):
         if node_names is None:
@@ -137,9 +141,9 @@ def testing():
     # print("Hello world")
     graph = Node_Graph()
 
-    graph.add_node('app1')
-    graph.add_node('app2')
-    graph.add_node('app3')
+    graph.add_node('app1', pos=(0,0))
+    graph.add_node('app2', pos=(10,10))
+    graph.add_node('app3', pos=(20,20))
 
     graph.set_target_node('app1')
     graph.add_edge('app1', 'app2')
@@ -181,5 +185,5 @@ def testGUI():
 
 
 if __name__ == '__main__':
-    testGUI()
-    # testing()
+    # testGUI()
+    testing()
