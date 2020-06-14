@@ -1,5 +1,4 @@
 import pydot
-import threading
 import time
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -147,55 +146,3 @@ class GraphVisualizer:
             u, v = self.prev_edge_test
             self.graph.remove_edge(u, v)
             self.flush(final=True)
-
-
-def testing():
-    # print("Hello world")
-    graph = Node_Graph()
-
-    graph.add_node('app1', pos=(0,0))
-    graph.add_node('app2', pos=(1,1))
-    graph.add_node('app3', pos=(2,2))
-
-    graph.set_target_node('app1')
-    graph.add_edge('app1', 'app2')
-    graph.save_graph("./__pic")
-
-    # graph.gui_thread_start()
-    time.sleep(2)
-
-    graph.set_target_node('app2')
-    graph.save_graph("./__pic.png")
-    time.sleep(2)
-
-    graph.add_edge('app2', 'app3')
-    graph.save_graph("./__pic.png")
-    time.sleep(2)
-
-    graph.set_edge_color('app2', 'app3', "green")
-    graph.save_graph("./__pic.png")
-    time.sleep(2)
-
-
-def testGUI():
-    gui = GraphVisualizer(enabled=True)
-    gui.draw_initialize(['app1', 'app2', 'app3', 'app4'])
-
-    gui.draw_target('app1')
-    gui.draw_edge_test('app2', 'app1')
-    gui.draw_dependency('app2', 'app1')
-    gui.draw_edge_test('app3', 'app1')
-    gui.draw_edge_test('app4', 'app1')
-    gui.draw_dependency('app4', 'app1')
-
-    gui.draw_target('app2')
-    gui.draw_edge_test('app1', 'app2')
-    gui.draw_dependency('app1', 'app2')
-    gui.draw_edge_test('app3', 'app2')
-    gui.draw_edge_test('app4', 'app2')
-    gui.draw_dependency('app4', 'app2')
-
-
-if __name__ == '__main__':
-    testGUI()
-    # testing()
