@@ -13,8 +13,9 @@ class Node_Graph():
     current_edge_test = None
 
     def __init__(self):
-        self.G = pydot.Dot(graph_type="digraph", prog='neato')
-        self.G.set_size("9,15\!")
+        self.G = pydot.Dot(graph_type="digraph")
+        self.G.set('splines', True)
+        self.G.set_size("9, 15\!")
         self.G.set_dpi(100)
 
         self.G.write_png("./__init.png")
@@ -48,7 +49,8 @@ class Node_Graph():
             self.G.add_node(pydot.Node(node_name))
         else:
             x, y = pos
-            node = pydot.Node(node_name, x=x, y=y)
+            node = pydot.Node(node_name)
+            node.set('pos', f'{x}, {y}!')
             self.G.add_node(node)
 
     def add_edge(self, node1, node2):
@@ -61,7 +63,7 @@ class Node_Graph():
     def save_graph(self, path):
         if not path.endswith("./__pic.png"):
             path += ".png"
-        self.G.write_png(path)
+        self.G.write(path, prog='neato', format='png')
 
     # def show_matplot(self):
     #     t = threading.currentThread()
@@ -102,8 +104,10 @@ class GraphVisualizer:
         if node_names is None:
             node_names = []
 
-        for node_name in node_names:
-            self.graph.add_node(node_name)
+        # positions = infer_positions(node_names)
+        positions = [(0,0), (0,1), (1,0), (1,1)]
+        for idx, node_name in enumerate(node_names):
+            self.graph.add_node(node_name, positions[idx])
 
         self.flush()
 
@@ -142,8 +146,8 @@ def testing():
     graph = Node_Graph()
 
     graph.add_node('app1', pos=(0,0))
-    graph.add_node('app2', pos=(10,10))
-    graph.add_node('app3', pos=(20,20))
+    graph.add_node('app2', pos=(1,1))
+    graph.add_node('app3', pos=(2,2))
 
     graph.set_target_node('app1')
     graph.add_edge('app1', 'app2')
@@ -166,7 +170,7 @@ def testing():
 
 
 def testGUI():
-    gui = GraphVisualizer()
+    gui = GraphVisualizer(enabled=True)
     gui.draw_initialize(['app1', 'app2', 'app3', 'app4'])
 
     gui.draw_target('app1')
@@ -185,5 +189,5 @@ def testGUI():
 
 
 if __name__ == '__main__':
-    # testGUI()
-    testing()
+    testGUI()
+    # testing()
