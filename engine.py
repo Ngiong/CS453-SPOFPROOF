@@ -63,6 +63,9 @@ def main():
 
     nodes = [node1, node2, node3, node4]
 
+    for node in nodes:
+        node.resurrect()
+
     # Nodes OK?
     for node in nodes:
         assert node.ping()

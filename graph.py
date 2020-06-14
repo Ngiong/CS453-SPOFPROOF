@@ -109,7 +109,11 @@ class GraphVisualizer:
             node_names = []
 
         # positions = infer_positions(node_names)
-        positions = [(0,2), (0,0), (2,2), (2,0), (4,2), (4,0), (6,2), (6,0), (8,2), (8,0), (10,2), (10,0), (12,2), (12,0), (14,2), (14,0)]
+        positions = []
+        for idx, node_name in enumerate(node_names):
+            x, y = (idx // 2) * 2, 2 if idx % 2 == 0 else 0
+            positions.append((x, y))
+
         for idx, node_name in enumerate(node_names):
             self.graph.add_node(node_name, positions[idx])
 
