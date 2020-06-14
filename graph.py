@@ -100,7 +100,8 @@ class GraphVisualizer:
 
     def __init__(self, enabled=False):
         self.enabled = enabled
-        web.open(os.path.dirname(os.path.realpath(__file__))+"/spofproof.html")
+        if self.enabled == True:
+            web.open(os.path.dirname(os.path.realpath(__file__))+"/spofproof.html")
 
     def flush(self, final=False):
         if self.enabled or final:
