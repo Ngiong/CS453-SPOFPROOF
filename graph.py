@@ -60,10 +60,14 @@ class Node_Graph():
     def remove_edge(self, node1, node2):
         self.G.del_edge(node1, node2)
 
-    def save_graph(self, path):
+    def save_graph(self, path, final=False):
         if not path.endswith("./__pic.png"):
             path += ".png"
-        self.G.write(path, prog='neato', format='png')
+
+        if final:
+            self.G.write(path, prog='dot', format='png')
+        else:
+            self.G.write(path, prog='neato', format='png')
 
     # def show_matplot(self):
     #     t = threading.currentThread()
@@ -95,10 +99,10 @@ class GraphVisualizer:
     def __init__(self, enabled=False):
         self.enabled = enabled
 
-    def flush(self):
+    def flush(self, final=False):
         if self.enabled:
-            self.graph.save_graph(self.target_img)
-            time.sleep(2)
+            self.graph.save_graph(self.target_img, final)
+            time.sleep(1.25)
 
     def draw_initialize(self, node_names=None):
         if node_names is None:
@@ -138,7 +142,7 @@ class GraphVisualizer:
         if self.prev_edge_test is not None:
             u, v = self.prev_edge_test
             self.graph.remove_edge(u, v)
-            self.flush()
+            self.flush(final=True)
 
 
 def testing():
