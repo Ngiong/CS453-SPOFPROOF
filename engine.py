@@ -9,7 +9,7 @@ class SPOFProofEngine:
         for inode in inodes:
             self.nodes[inode.get_name()] = inode
 
-    def run_test(self, n_tests=1):
+    def run_test(self, n_tests=1, sim_mode=False):
         for node_name in self.nodes:
             other_nodes = self.nodes.copy()
             other_nodes.pop(node_name, None)
