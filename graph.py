@@ -64,6 +64,9 @@ class Node_Graph():
             path += ".png"
 
         if final:
+            if self.target_node != "":
+                current = self.G.get_node(self.target_node)
+                current[0].set_style("None")
             self.G.write(path, prog='dot', format='png')
         else:
             self.G.write(path, prog='neato', format='png')
@@ -99,7 +102,7 @@ class GraphVisualizer:
         self.enabled = enabled
 
     def flush(self, final=False):
-        if self.enabled:
+        if self.enabled or final:
             self.graph.save_graph(self.target_img, final)
             time.sleep(1.25)
 
@@ -145,4 +148,4 @@ class GraphVisualizer:
         if self.prev_edge_test is not None:
             u, v = self.prev_edge_test
             self.graph.remove_edge(u, v)
-            self.flush(final=True)
+        self.flush(final=True)
