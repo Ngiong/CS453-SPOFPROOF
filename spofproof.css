@@ -1,0 +1,10 @@
+body {
+    background-color: #eee;
+}
+html {
+	font-family: 'Roboto', sans-serif;
+}
+
+#div_content {
+	text-align: center;
+}
