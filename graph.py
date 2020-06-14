@@ -71,10 +71,17 @@ class Node_Graph():
     def graph_build_finished(self):
         if self.source_node != "":
             self.edge_color_normalization(self.source_node)
+            current = self.G.get_node(self.source_node.name)
+            current[0].set_style("None")
+
+        if self.target_node != "":
+            current = self.G.get_node(self.target_node)
+            current[0].set_style("None")
+
 
 
 def testing(): 
-    delay = 0
+    delay = 1
     web.open(os.path.dirname(os.path.realpath(__file__))+"/spofproof.html")
     graph = Node_Graph("testgraph")
     node1 = POCNode('app1', '127.0.0.1', 5000)
@@ -92,32 +99,32 @@ def testing():
     graph.set_source_node(node1)
     graph.set_target_node(node2)
     graph.add_edge(node1,node2)
-    graph.save_graph("./pic1.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     graph.del_edge(node1, node2)
-    graph.save_graph("./pic2.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     ### EDGE 2###
     graph.set_target_node(node3)
     graph.add_edge(node1,node3)
-    graph.save_graph("./pic3.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     graph.set_edge_color(node1,node3,"green")
-    graph.save_graph("./pic4.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     ### EDGE 3###
     graph.set_target_node(node4)
     graph.add_edge(node1,node4)
 
-    graph.save_graph("./pic5.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     graph.del_edge(node1, node4)
-    graph.save_graph("./pic6")
+    graph.save_graph("./pic")
     time.sleep(delay)
 
     ### Source Node 2###
@@ -125,31 +132,31 @@ def testing():
     ### EDGE 1###
     graph.set_target_node(node1)
     graph.add_edge(node2,node1)
-    graph.save_graph("./pic7.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     graph.set_edge_color(node2,node1,"green")
-    graph.save_graph("./pic8.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     ### EDGE 2###
     graph.set_target_node(node3)
     graph.add_edge(node2,node3)
-    graph.save_graph("./pic9.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     graph.del_edge(node2, node3)
-    graph.save_graph("./pic10")
+    graph.save_graph("./pic")
     time.sleep(delay)
 
     ### EDGE 3###
     graph.set_target_node(node4)
     graph.add_edge(node2,node4)
-    graph.save_graph("./pic11.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     graph.set_edge_color(node2,node4,"green")
-    graph.save_graph("./pic12.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     ### Source Node 3###
@@ -157,32 +164,32 @@ def testing():
     graph.set_source_node(node3)
     graph.set_target_node(node1)
     graph.add_edge(node3,node1)
-    graph.save_graph("./pic13.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     graph.del_edge(node3, node1)
-    graph.save_graph("./pic14.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     ### EDGE 2###
     graph.set_target_node(node2)
     graph.add_edge(node3,node2)
-    graph.save_graph("./pic15.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     graph.set_edge_color(node3,node2,"green")
-    graph.save_graph("./pic16.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     ### EDGE 3###
     graph.set_target_node(node4)
     graph.add_edge(node3,node4)
 
-    graph.save_graph("./pic17.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     graph.del_edge(node3, node4)
-    graph.save_graph("./pic18")
+    graph.save_graph("./pic")
     time.sleep(delay)
 
     ### Source Node 4###
@@ -190,36 +197,36 @@ def testing():
     ### EDGE 1###
     graph.set_target_node(node1)
     graph.add_edge(node4,node1)
-    graph.save_graph("./pic19.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     graph.set_edge_color(node4,node1,"green")
-    graph.save_graph("./pic20.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     ### EDGE 2###
     graph.set_target_node(node2)
     graph.add_edge(node4,node2)
-    graph.save_graph("./pic21.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     graph.del_edge(node4, node2)
-    graph.save_graph("./pic22")
+    graph.save_graph("./pic")
     time.sleep(delay)
 
     ### EDGE 3###
-    graph.set_target_node(node4)
+    graph.set_target_node(node3)
     graph.add_edge(node4,node3)
-    graph.save_graph("./pic23.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     graph.set_edge_color(node4,node3,"green")
-    graph.save_graph("./pic24.png")
+    graph.save_graph("./pic.png")
     time.sleep(delay)
 
     # finish raph building
     graph.graph_build_finished()
-    graph.save_graph("./pic25.png")
+    graph.save_graph("./pic.png")
 
 
 if __name__ == '__main__':
