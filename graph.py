@@ -84,10 +84,15 @@ class GUI:
     target_img = './__pic.png'
     graph = Node_Graph()
     prev_edge_test = None
+    enabled = False
+
+    def __init__(self, enabled=False):
+        self.enabled = enabled
 
     def flush(self):
-        self.graph.save_graph(self.target_img)
-        time.sleep(2)
+        if self.enabled:
+            self.graph.save_graph(self.target_img)
+            time.sleep(2)
 
     def draw_initialize(self, node_names=None):
         if node_names is None:
