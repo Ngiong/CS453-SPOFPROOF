@@ -10,7 +10,7 @@
   <body onload="updateImage();">
     <div id="div_content">
       <h1>SPOOFPROOF</h1>
-      <img name="graph" src="./pic.png" alt="Italian Trulli">
+      <img name="graph" src="./__pic.png" alt="Italian Trulli">
     </div>
   </body>
 </html>
@@ -27,8 +27,10 @@
     
        //call itself again (in milliseconds)
     
-       setTimeout("updateImage()",3000);
-    
+       // setTimeout("updateImage()",3000);
+
     }
+
+    setInterval(updateImage, 500);
     
     </script>

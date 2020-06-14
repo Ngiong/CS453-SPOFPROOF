@@ -20,8 +20,8 @@ class Node_Graph():
         self.G.set_size("9,15\!")
         self.G.set_dpi(100)
 
-        self.G.write_png("./init.png")
-        img = mpimg.imread('./init.png')
+        self.G.write_png("./__init.png")
+        img = mpimg.imread('./__init.png')
         # X = [[1]]# sample 2D array
         self.figure = plt.imshow(img, aspect=1)  # , aspect='auto'
         # plt.axis("scaled")
@@ -58,7 +58,7 @@ class Node_Graph():
         self.G.add_edge(edge)
 
     def save_graph(self, path):
-        if not path.endswith("./pic.png"):
+        if not path.endswith("./__pic.png"):
             path += ".png"
         self.G.write_png(path)
 
@@ -66,7 +66,7 @@ class Node_Graph():
         t = threading.currentThread()
         while getattr(t, "do_run", True):
             # print("called")
-            img = mpimg.imread('./pic.png')
+            img = mpimg.imread('./__pic.png')
             # self.figure.set_data(img)
             plt.figure(img)
             plt.show()
@@ -93,21 +93,24 @@ def testing():
     graph.add_node(node1)
     graph.add_node(node2)
     graph.add_node(node3)
+
     graph.set_target_node(node1)
     graph.add_edge(node1, node2)
-    graph.save_graph("./pic")
+    graph.save_graph("./__pic")
+
     # graph.gui_thread_start()
     time.sleep(2)
+
     graph.set_target_node(node2)
-    graph.save_graph("./pic.png")
+    graph.save_graph("./__pic.png")
     time.sleep(2)
 
     graph.add_edge(node2, node3)
-    graph.save_graph("./pic.png")
+    graph.save_graph("./__pic.png")
     time.sleep(2)
 
     graph.set_edge_color(node2, node3, "green")
-    graph.save_graph("./pic.png")
+    graph.save_graph("./__pic.png")
     time.sleep(2)
 
     # graph.gui_thread_stop()
