@@ -49,7 +49,6 @@ class Node_Graph():
             # only reset color if it is not the source node
             if current[0].get_fillcolor() != "blue":
                 current[0].set_style("None")
-
         graph_node = self.G.get_node(node.name)
         graph_node[0].set_style("filled")
         graph_node[0].set_fillcolor("red")
@@ -62,18 +61,18 @@ class Node_Graph():
             if color != "black":
                 self.colored_edges_dest.append(dest)
 
-    #getting called, when source node is changed
+    # getting called, when source node is changed
     def edge_color_normalization(self, src):
         for node in self.colored_edges_dest:
             self.set_edge_color(src,node,"black")
         self.colored_edges_dest = []
 
+    # reset colors of source and target node
     def graph_build_finished(self):
         if self.source_node != "":
             self.edge_color_normalization(self.source_node)
             current = self.G.get_node(self.source_node.name)
             current[0].set_style("None")
-
         if self.target_node != "":
             current = self.G.get_node(self.target_node)
             current[0].set_style("None")
