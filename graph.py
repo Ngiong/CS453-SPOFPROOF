@@ -80,7 +80,7 @@ class Node_Graph():
         self.gui_thread.join()
 
 
-class GUI:
+class GraphVisualizer:
     target_img = './__pic.png'
     graph = Node_Graph()
     prev_edge_test = None
@@ -92,7 +92,7 @@ class GUI:
     def flush(self):
         if self.enabled:
             self.graph.save_graph(self.target_img)
-            time.sleep(2)
+            time.sleep(0.5)
 
     def draw_initialize(self, node_names=None):
         if node_names is None:
@@ -103,7 +103,11 @@ class GUI:
 
         self.flush()
 
-    def draw_kill(self, node):
+    def draw_target(self, node):
+        if self.prev_edge_test is not None:
+            u, v = self.prev_edge_test
+            self.graph.remove_edge(u, v)
+
         self.graph.set_target_node(node)
         self.flush()
 
@@ -121,6 +125,12 @@ class GUI:
         self.graph.set_edge_color(src, dest, "black")
         self.flush()
         self.prev_edge_test = None
+
+    def draw_complete_test(self):
+        if self.prev_edge_test is not None:
+            u, v = self.prev_edge_test
+            self.graph.remove_edge(u, v)
+            self.flush()
 
 
 def testing():
@@ -152,17 +162,17 @@ def testing():
 
 
 def testGUI():
-    gui = GUI()
+    gui = GraphVisualizer()
     gui.draw_initialize(['app1', 'app2', 'app3', 'app4'])
 
-    gui.draw_kill('app1')
+    gui.draw_target('app1')
     gui.draw_edge_test('app2', 'app1')
     gui.draw_dependency('app2', 'app1')
     gui.draw_edge_test('app3', 'app1')
     gui.draw_edge_test('app4', 'app1')
     gui.draw_dependency('app4', 'app1')
 
-    gui.draw_kill('app2')
+    gui.draw_target('app2')
     gui.draw_edge_test('app1', 'app2')
     gui.draw_dependency('app1', 'app2')
     gui.draw_edge_test('app3', 'app2')
