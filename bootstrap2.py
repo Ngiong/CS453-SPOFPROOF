@@ -205,12 +205,78 @@ def bootstrap(graph=None):
         port = int(port)
         print(f'[INFO] {name} is running on {host} (PORT: {port})')
 
+def bootstrap2(graph=None, replication=1):
+    if graph is None:
+        graph = {}
+
+    host = '127.0.0.1'
+    name_and_address = []
+    dependencies = dict()
+
+    # assign port for each node
+    port_counter = 1
+    LB_PORT = dict()
+    for node, node_dependencies in graph.items():
+        LB_PORT[node] = 5000 + port_counter
+        port_counter += 1
+
+    for node, node_dependencies in graph.items():
+        replica_ports = []
+        for rep in range(replication):
+            node_name = "app" + str(node) + f'_{rep}'
+            port = 5000 + port_counter
+            port_counter += 1
+            replica_ports.append(port)
+
+            address = host + ':' + str(port)
+            name_and_address.append((node_name, address))
+            dependencies[node_name] = []
+
+            for dep in node_dependencies:
+                if node == dep:
+                    continue
+                lb_port = LB_PORT[dep]
+                dependencies[node_name].append(host + ':' + str(lb_port))
+
+            if len(dependencies[node_name]) == 0:
+                SimpleNodeStartable(node_name).start(port=port)
+            else:
+                SimpleNodeStartable(node_name, dependencies[node_name]).start(port=port)
+
+            PORT_APP[port] = node_name
+
+        transformed_loc = [f'{host}:{x}' for x in replica_ports]
+        node_name = "LB" + str(node)
+        port = LB_PORT[node]
+        address = host + ':' + str(port)
+        name_and_address.append((node_name, address))
+
+        SimpleNodeStartable(node_name, transformed_loc, True).start(port=port)
+        PORT_APP[port] = node_name
+
+
+    time.sleep(1)
+    print(f'''
+!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! BOOTSTRAP SUCCESSFUL !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!
+''')
+    for (node_name, address) in name_and_address:
+        name = node_name
+        port = address.split(":")[1]
+        port = int(port)
+        print(f'[INFO] {name} is running on {host} (PORT: {port})')
+
 
 if __name__ == '__main__':
+    # graph = {
+    #     1: {2, 3},
+    #     2: {4},
+    #     3: {},
+    #     4: {}
+    # }
     graph = {
-        1: {2, 3},
-        2: {4},
-        3: {},
-        4: {}
+        1: {2},
+        2: {}
     }
-    bootstrap(graph)
+    bootstrap2(graph, 1)
