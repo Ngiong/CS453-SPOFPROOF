@@ -24,6 +24,10 @@ class INode(ABC):
     # Representation of microservices
     # Should use interface so that our project can be "extensible" for non-localhost
     @abstractmethod
+    def __init__(self, name, ip_address, port):
+        pass
+
+    @abstractmethod
     def __str__(self):
         pass
 
@@ -37,6 +41,18 @@ class INode(ABC):
 
     @abstractmethod
     def get_name(self):
+        pass
+
+    @abstractmethod
+    def get_url(self, path):
+        pass
+
+    @abstractmethod
+    def kill(self):
+        pass
+
+    @abstractmethod
+    def resurrect(self):
         pass
 
 
@@ -60,13 +76,10 @@ class SimpleNode(INode):
         return f'http://{self.ip_address}:{self.port}{path}'
 
     def ping(self) -> bool:
-        # TODO: when called, it will hit the ping API in the node
-        # TODO: (cont.d) then node will ping all of its dependencies
         response = http_get(self.get_url('/ping'))
         return response.status_code == 200
 
     def set_response_level(self, response_level: ResponseLevel):
-        # TODO: when called, it will hit the set response level API in the node
         level = response_level.value
         response = http_get(self.get_url(f'/response/{level}'))
         return response.status_code == 200   

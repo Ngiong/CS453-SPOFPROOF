@@ -54,28 +54,3 @@ class SPOFProofEngine:
         print(self.dependency_found)
 
 
-def main():
-    # Initialize node for test
-    node1 = SimpleNode('app1', '127.0.0.1', 5001)
-    node2 = SimpleNode('app2', '127.0.0.1', 5002)
-    node3 = SimpleNode('app3', '127.0.0.1', 5003)
-    node4 = SimpleNode('app4', '127.0.0.1', 5004)
-
-    nodes = [node1, node2, node3, node4]
-
-    for node in nodes:
-        node.resurrect()
-
-    # Nodes OK?
-    for node in nodes:
-        assert node.ping()
-
-    # Test the engine
-    engine = SPOFProofEngine()
-    engine.set_nodes(nodes)
-    engine.run_test(n_tests=10, sim_mode=True)
-    engine.print_dependency()
-
-
-if __name__ == '__main__':
-    main()
