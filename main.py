@@ -9,6 +9,8 @@ def main():
     node3 = SimpleNode('app3', '127.0.0.1', 5003)
     node4 = SimpleNode('app4', '127.0.0.1', 5004)
 
+    nodes = [node1, node2, node3, node4]
+
     for node in nodes:
         node.resurrect()
 
@@ -16,7 +18,7 @@ def main():
         assert node.ping()
 
     engine = SPOFProofEngine()
-    engine.set_nodes([node1, node2, node3, node4])
+    engine.set_nodes(nodes)
     engine.run_test(n_tests=10, sim_mode=True)
     engine.print_dependency()
 
