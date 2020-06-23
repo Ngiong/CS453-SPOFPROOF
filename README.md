@@ -30,6 +30,33 @@ The INode class show the abstraction of what should be included in the class. He
 The class `SimpleNode` in the same file is an example on how to implement the class.
 
 ### 2. Set up the testing process
-In the `main.py` file, list each of the nodes that are included in the network with its ip address and port using the user-custom node class that has been created before. This is done assuming that the network of nodes is already running. If not, `bootstrap.py` can be used to run the nodes.
+In the `main.py` file, list each of the nodes that are included in the network with its ip address and port using the user-custom node class that has been created before. For example: 
 
-Then, create a SPOFProofEngine() object, set the node list using `set_nodes(nodes)` method, and run the engine using `run_test()` method. The result will be shown in form of a graph, and using this graph, SPOF detection can be performed
+```
+node1 = SimpleNode('app1', '127.0.0.1', 5001)
+node2 = SimpleNode('app2', '127.0.0.1', 5002)
+node3 = SimpleNode('app3', '127.0.0.1', 5003)
+node4 = SimpleNode('app4', '127.0.0.1', 5004)
+```
+
+This is done assuming that the network of nodes is already running. If not, `bootstrap.py` can be used to run the nodes. To stimulate a network of nodes, add the list of nodes along with its dependencies in the bottom of part of the boostrap file. For example, 
+```
+graph = {
+    1: {2, 3},
+    2: {4},
+    3: {},
+    4: {}
+}
+bootstrap(graph)
+```
+means that there are 4 nodes where node 1 depends on node 2 and 3, while node 2 depends on node 4.
+To run the bootstrap, use command `python3 bootstrap.py`. 
+
+Then, create a SPOFProofEngine() object, set the node list using `set_nodes(nodes)` method. For example, 
+`engine.set_nodes([node1, node2, node3, node4])` sets the nodes for the boostrap sample.
+The engine can be run using `run_test(n_test, sim_mode)` method, where n_test is the number of tests that needs to be done and sim_mode is true if the simulation graph needs to be displayed and false otherwise. For example,
+```
+engine.run_test(n_tests=10, sim_mode=True)
+```
+means that the test need to be run 10 times, and at the end of the test, the graph should be displayed
+.Using the resulting graph, SPOF detection can be performed.
